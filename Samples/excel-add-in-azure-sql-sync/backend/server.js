@@ -134,8 +134,8 @@ app.post("/api/sync", async (req, res) => {
       if (syncMode === "upsert") {
         rowsAffected = await upsertRows(db, safeName, headers, rows);
       } else {
-        // "insert" and "replace" both use bulk insert (ignore duplicates for "insert")
-        rowsAffected = await bulkInsertRows(db, safeName, headers, rows, syncMode === "insert");
+        // "insert" and "replace" both use bulk insert
+        rowsAffected = await bulkInsertRows(db, safeName, headers, rows);
       }
     }
 
@@ -202,7 +202,7 @@ async function truncateTableIfExists(db, tableName) {
  *
  * For the "insert" sync mode, we use INSERT … WHERE NOT EXISTS to skip duplicates.
  */
-async function bulkInsertRows(db, tableName, headers, rows, skipDuplicates) {
+async function bulkInsertRows(db, tableName, headers, rows) {
   const table = buildBulkTable(tableName, headers, rows);
   const request = db.request();
 
@@ -325,7 +325,7 @@ function quoteIdentifier(name) {
 
 /** Remove characters not safe in SQL identifiers. */
 function sanitizeIdentifier(name) {
-  if (!name && name !== 0) return "";
+  if (name == null) return "";
   return String(name)
     .replace(/[^a-zA-Z0-9_]/g, "_")
     .replace(/^([0-9])/, "_$1")

@@ -238,7 +238,7 @@ async function readSheet(sheetName) {
     }
 
     const allValues = usedRange.values; // 2D array [row][col]
-    const headers   = allValues[0].map((h) => (h == null || h === "" ? `Col${allValues[0].indexOf(h)}` : String(h)));
+    const headers   = allValues[0].map((h, i) => (h == null || h === "" ? `Col${i}` : String(h)));
 
     // Build row objects. Empty trailing rows are skipped for cleanliness.
     const rows = [];
