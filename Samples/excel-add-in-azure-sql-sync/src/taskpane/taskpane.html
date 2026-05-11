@@ -1,0 +1,89 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+     See LICENSE in the project root for license information. -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Excel to Azure SQL Sync</title>
+  <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <link rel="stylesheet"
+    href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css" />
+  <link rel="stylesheet" href="taskpane.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Excel → Azure SQL Sync</h1>
+    <p class="subtitle">Sync your Excel worksheet data directly into Azure SQL Database.</p>
+
+    <!-- Step 1: Backend API Configuration -->
+    <section class="step-section">
+      <h2 class="step-title">Step 1 — Configure Backend API</h2>
+      <p>Enter the URL of the backend sync API (see <code>backend/</code> folder) and an optional API key.</p>
+      <div class="field-row">
+        <label for="apiUrl">API Endpoint URL</label>
+        <input type="text" id="apiUrl" class="input-box"
+          placeholder="https://your-backend.azurewebsites.net/api/sync" />
+      </div>
+      <div class="field-row">
+        <label for="apiKey">API Key <span class="optional">(optional)</span></label>
+        <input type="password" id="apiKey" class="input-box" placeholder="Leave blank if not required" />
+      </div>
+      <div class="field-row">
+        <label for="batchSize">Row Batch Size</label>
+        <input type="number" id="batchSize" class="input-box input-small" value="200" min="10" max="2000" />
+        <span class="hint">Rows sent per request. Reduce if timeouts occur with wide tables.</span>
+      </div>
+      <div class="field-row">
+        <label for="syncMode">Sync Mode</label>
+        <select id="syncMode" class="input-box">
+          <option value="upsert">Upsert (insert or update)</option>
+          <option value="insert">Insert only (skip duplicates)</option>
+          <option value="replace">Replace table (truncate &amp; re-insert)</option>
+        </select>
+      </div>
+      <button id="saveConfig" class="btn btn-secondary">Save Configuration</button>
+    </section>
+
+    <!-- Step 2: Sheet Selection -->
+    <section class="step-section">
+      <h2 class="step-title">Step 2 — Select Sheets to Sync</h2>
+      <p>Choose which worksheets to include. Each sheet maps to a separate SQL table.</p>
+      <button id="refreshSheets" class="btn btn-secondary">Refresh Sheet List</button>
+      <div id="sheetList" class="sheet-list">
+        <p class="hint">Click "Refresh Sheet List" to load available worksheets.</p>
+      </div>
+    </section>
+
+    <!-- Step 3: Sync -->
+    <section class="step-section">
+      <h2 class="step-title">Step 3 — Sync to Azure SQL</h2>
+      <p>Click the button below to read the selected sheets and push their data to Azure SQL.</p>
+      <button id="syncButton" class="btn btn-primary">Sync to Azure SQL</button>
+
+      <!-- Progress -->
+      <div id="progressArea" class="progress-area hidden">
+        <div class="progress-label">
+          <span id="progressText">Preparing…</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-track">
+          <div id="progressBar" class="progress-bar-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Status messages -->
+    <div id="statusArea"></div>
+
+    <!-- Log -->
+    <section class="step-section">
+      <h2 class="step-title">Sync Log</h2>
+      <div id="logArea" class="log-area"></div>
+      <button id="clearLog" class="btn btn-link">Clear Log</button>
+    </section>
+  </div>
+
+  <script type="text/javascript" src="./taskpane.js"></script>
+</body>
+</html>
